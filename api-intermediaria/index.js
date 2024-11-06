@@ -60,7 +60,7 @@ app.get('/repos', async (req, res) => {
   const sort = req.query.sort || 'created_at';  // Parâmetro de ordenação (padrão 'created_at')
   const direction = req.query.direction || 'asc';  // Direção da ordenação (padrão 'asc')
   
-  const urlBase = `https://api.github.com/orgs/${org}/repos?sort=${sort}&direction=${direction}&per_page=100`;
+  const urlBase = `https://api.github.com/orgs/${org}/repos?sort=${sort}&direction=${direction}&per_page=20`;
 
   try {
     // Buscar todos os repositórios da organização com paginação

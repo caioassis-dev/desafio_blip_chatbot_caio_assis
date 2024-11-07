@@ -31,19 +31,38 @@ app.get('/repos', async (req, res) => {
   const language = req.query.language || 'C#'; // Linguagem a ser filtrada, padrão 'C#'
   const sort = 'created';  // Ordenar por data de criação
   const direction = 'asc';  // Ordem crescente (do mais antigo ao mais novo)
-  const perPage = 8;  // Limita a quantidade de repositórios por página a 8
+  const perPage = 6;  // Limita a quantidade de repositórios por página a 6
+  const minRepos = 5;  // Número mínimo de repositórios com linguagem C# desejado conforme solicitado no desafio para criar 5 cards
 
-  const urlBase = `https://api.github.com/orgs/${org}/repos?sort=${sort}&direction=${direction}&per_page=${perPage}`;
+  let page = 1;  // Começar da primeira página
+  let allRepos = [];
 
   try {
-    // Buscar os repositórios da primeira página
-    const repos = await fetchRepos(urlBase);
-    
-    // Filtra os repositórios pela linguagem C#
-    const filteredRepos = repos.filter(repo => repo.language === language);
+    while (allRepos.length < minRepos) {
+      const urlBase = `https://api.github.com/orgs/${org}/repos?sort=${sort}&direction=${direction}&per_page=${perPage}&page=${page}`;
+      const repos = await fetchRepos(urlBase);
 
-    // Retorna os repositórios como resposta JSON
-    res.json(filteredRepos);
+      // Filtra os repositórios pela linguagem C#
+      const filteredRepos = repos.filter(repo => repo.language === language);
+
+      // Adiciona os repositórios filtrados à lista final
+      allRepos = allRepos.concat(filteredRepos);
+
+      // Se encontrou 5 ou mais repositórios com a linguagem C#, para a busca
+      if (allRepos.length >= minRepos) {
+        break;
+      }
+
+      // Caso contrário, avança para a próxima página
+      page++;
+    }
+
+    // Se tiver pelo menos 5 repositórios, retorna
+    if (allRepos.length >= minRepos) {
+      res.json(allRepos.slice(0, minRepos));  // Retorna os 5 primeiros repositórios encontrados
+    } else {
+      res.status(404).json({ error: 'Não foi possível encontrar 5 repositórios com a linguagem C#.' });
+    }
   } catch (error) {
     console.error('Erro ao buscar repositórios:', error);
     res.status(500).json({ error: 'Erro ao buscar os dados do GitHub' });

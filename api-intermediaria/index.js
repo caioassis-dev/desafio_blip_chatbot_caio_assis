@@ -31,7 +31,7 @@ app.get('/repos', async (req, res) => {
   const language = req.query.language || 'C#'; // Linguagem a ser filtrada, padrão 'C#'
   const sort = 'created';  // Ordenar por data de criação
   const direction = 'asc';  // Ordem crescente (do mais antigo ao mais novo)
-  const perPage = 5;  // Limita a quantidade de repositórios por página a 5
+  const perPage = 8;  // Limita a quantidade de repositórios por página a 8
 
   const urlBase = `https://api.github.com/orgs/${org}/repos?sort=${sort}&direction=${direction}&per_page=${perPage}`;
 
